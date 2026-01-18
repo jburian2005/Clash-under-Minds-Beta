@@ -1,13 +1,10 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clash under Minds – Intro</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/intro.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
 
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/intro.css') }}">
+{% endblock %}
+
+{% block body %}
 <div class="intro-container">
 
     <div class="intro-logo-wrapper shake">
@@ -41,3 +38,4 @@
 
 </body>
 </html>
+{% endblock %}
