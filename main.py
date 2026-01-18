@@ -798,6 +798,11 @@ def prevent_quiz_exit(f):
 # ===================
 
 @app.route('/')
+def intro():
+    """Zeigt das Intro beim ersten Aufruf der Seite"""
+    return render_template('intro.html')
+
+@app.route('/index')
 @prevent_quiz_exit 
 def index():
     """Startseite der Anwendung"""
