@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_multiplayer.css') }}"/>
+{% endblock %}
+
+{% block body %}
+<div class="multiplayer-page">
+    <div class="glass-card">
+        <h1 class="title">Weltraum-Lobby</h1>
+        
+        <div class="action-bar">
+            <form action="{{ url_for('create_room') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="game-btn create-btn">Raum erstellen</button>
+            </form>
+            
+            <div class="search-box">
+                <input type="text" id="codeInp" placeholder="Privater Code" maxlength="5">
+                <button onclick="checkCode()" class="game-btn join-btn">Suchen & Beitreten</button>
+            </div>
+        </div>
+
+        <div class="room-list-container">
+            <h3>Offene Räume</h3>
+            <ul id="roomList">
+                {% for r in public_rooms %}
+                <li class="room-item">
+                    <span>{{ r.name }} ({{ r.host.username }})</span>
+                    <a href="{{ url_for('multiplayer_layout', room_id=r.id) }}">Beitreten</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script>
+    const socket = io();
+
+    // Echtzeit-Update: Neuer Raum erscheint sofort
+    socket.on('new_public_room', function(data) {
+        const list = document.getElementById('roomList');
+        const li = document.createElement('li');
+        li.className = 'room-item';
+        li.innerHTML = `<span>${data.name} (${data.host})</span><a href="/multiplayer/layout/${data.id}">Beitreten</a>`;
+        list.prepend(li);
+    });
+
+    function checkCode() {
+        const code = document.getElementById('codeInp').value;
+        fetch('/api/find_room', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}'},
+            body: JSON.stringify({code: code})
+        })
+        .then(r => r.json())
+        .then(data => {
+            if(data.success) {
+                window.location.href = "/multiplayer/layout/" + data.room_id;
+            } else {
+                alert("Code falsch oder Raum existiert nicht.");
+            }
+        });
+    }
+</script>
+{% endblock %}

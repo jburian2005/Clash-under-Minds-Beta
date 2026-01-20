@@ -22,6 +22,34 @@ from functools import wraps  # Für Decorator-Funktionen
 from flask_wtf.csrf import CSRFProtect, generate_csrf, CSRFError  # CSRF-Schutz
 from dotenv import load_dotenv  # Umgebungsvariablen aus .env-Datei
 
+
+
+
+
+
+
+
+
+
+
+
+
+# --- Zusätzliche Imports ganz oben ---
+import random
+import uuid
+
+
+
+
+
+
+
+
+
+
+
+
+
 load_dotenv() # Lädt Umgebungsvariablen aus .env-Datei
 
 # Flask-App-Initialisierung
@@ -189,6 +217,44 @@ class TicketMessage(db.Model):
     content = db.Column(db.Text, nullable=False)  # Nachrichteninhalt
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     read = db.Column(db.Boolean, default=False)  # Gelesen-Status
+
+
+
+
+
+
+
+
+
+
+
+
+
+# --- Das Datenbank-Modell (nach der User-Klasse einfügen) ---
+class Room(db.Model):
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    name = db.Column(db.String(100), nullable=False)
+    host_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    is_private = db.Column(db.Boolean, default=False)
+    code = db.Column(db.String(5), nullable=True, index=True)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    
+    host = db.relationship('User', backref=db.backref('hosted_rooms', lazy=True))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Hilfsfunktion für ungelesene Nachrichten
 def get_unread_ticket_messages_count(user):
@@ -2841,6 +2907,166 @@ def admin_delete_ticket(ticket_id):
         print(f"Fehler beim Löschen des Tickets: {e}")
         flash('Fehler beim Löschen des Tickets.', 'error')
         return redirect(url_for('ticket_detail', ticket_id=ticket_id))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# --- Die Routen (im Bereich der Routes einfügen) ---
+
+@app.route('/multiplayer')
+def multiplayer_menu():
+    if 'username' not in session:
+        return redirect(url_for('index'))
+    public_rooms = Room.query.filter_by(is_private=False).order_by(Room.created_at.desc()).all()
+    return render_template('multiplayer_menu.html', public_rooms=public_rooms)
+
+@app.route('/multiplayer/create', methods=['POST'])
+def create_room():
+    if 'username' not in session:
+        return redirect(url_for('index'))
+    user = User.query.filter_by(username=session['username']).first()
+    new_room = Room(name=f"Raum von {user.username}", host_id=user.id, is_private=False)
+    db.session.add(new_room)
+    db.session.commit()
+    return redirect(url_for('multiplayer_settings', room_id=new_room.id))
+
+@app.route('/multiplayer/settings/<room_id>', methods=['GET', 'POST'])
+def multiplayer_settings(room_id):
+    room = Room.query.get_or_404(room_id)
+    if request.method == 'POST':
+        is_private = request.form.get('room_type') == 'private'
+        room.is_private = is_private
+        if is_private:
+            room.code = str(random.randint(10000, 99999))
+        else:
+            room.code = None
+            # Broadcast an alle: Ein neuer öffentlicher Raum ist da
+            socketio.emit('new_public_room', {'id': room.id, 'name': room.name, 'host': room.host.username})
+        db.session.commit()
+        return redirect(url_for('multiplayer_layout', room_id=room.id))
+    return render_template('multiplayer_settings.html', room=room)
+
+@app.route('/multiplayer/layout/<room_id>')
+def multiplayer_layout(room_id):
+    room = Room.query.get_or_404(room_id)
+    return render_template('multiplayer_layout.html', room=room)
+
+@app.route('/api/find_room', methods=['POST'])
+def find_room():
+    data = request.get_json()
+    code = data.get('code')
+    room = Room.query.filter_by(code=code, is_private=True).first()
+    if room:
+        return jsonify({'success': True, 'room_id': room.id, 'name': room.name, 'host': room.host.username})
+    return jsonify({'success': False})
+
+# --- SocketIO Events (im Bereich der Sockets einfügen) ---
+
+@socketio.on('join_multiplayer_room')
+def handle_join_multiplayer(data):
+    room_id = data.get('room_id')
+    if room_id:
+        join_room(room_id)
+        print(f"User {session.get('username')} joined room {room_id}")
+        emit('status', {'msg': f"{session.get('username')} ist beigetreten."}, room=room_id)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # ========================
 # WEBSOCKET-EVENT-HANDLER

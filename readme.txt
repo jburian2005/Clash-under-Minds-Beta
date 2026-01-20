@@ -1,3 +1,16 @@
+
+pip install flask-socketio eventlet
+
+
+
+
+
+
+
+
+
+
+
 Clash under Minds (Betriebsanleitung)
 
 Live-Version

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_multiplayer.css') }}"/>
+{% endblock %}
+
+{% block body %}
+<div class="multiplayer-page">
+    <div class="glass-card">
+        <h2>Raum konfigurieren</h2>
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="setting-group">
+                <p>Wie soll dein Raum gelistet werden?</p>
+                <label><input type="radio" name="room_type" value="public" checked> Öffentlich</label>
+                <label><input type="radio" name="room_type" value="private"> Privat (nur mit Code)</label>
+            </div>
+            <button type="submit" class="game-btn start-btn">Raum starten</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

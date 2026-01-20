@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_multiplayer.css') }}"/>
+{% endblock %}
+
+{% block body %}
+<div class="multiplayer-page">
+    <div class="glass-card">
+        <h1>Raum: {{ room.name }}</h1>
+        {% if room.is_private %}
+            <div class="code-badge">EINLADUNGSCODE: {{ room.code }}</div>
+        {% endif %}
+        
+        <div id="playerStatus" style="margin-top: 20px; color: #00ff00;">
+            Warte auf Synchronisation...
+        </div>
+
+        <div class="game-area" style="min-height: 200px; margin-top: 30px; border: 1px dashed rgba(255,255,255,0.2);">
+            <p>Spielinhalt wird geladen...</p>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script>
+    const socket = io();
+    const roomId = "{{ room.id }}";
+
+    socket.emit('join_multiplayer_room', { room_id: roomId });
+
+    socket.on('status', function(data) {
+        const statusDiv = document.getElementById('playerStatus');
+        const p = document.createElement('p');
+        p.textContent = data.msg;
+        statusDiv.appendChild(p);
+    });
+</script>
+{% endblock %}
