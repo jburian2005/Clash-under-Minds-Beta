@@ -1,34 +1,54 @@
 {% extends "base.html" %}
+
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_multiplayer.css') }}"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 {% endblock %}
 
 {% block body %}
 <div class="multiplayer-page">
+    
+    <div class="header-controls">
+        <a href="{{ url_for('playermenu') }}" class="back-button sound-button">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
     <div class="glass-card">
-        <h1 class="title">Weltraum-Lobby</h1>
+        <h1 class="title">Multiplayer Lobby</h1>
         
         <div class="action-bar">
             <form action="{{ url_for('create_room') }}" method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="game-btn create-btn">Raum erstellen</button>
+                <button type="submit" class="game-btn create-btn">
+                    <i class="fas fa-plus-circle"></i> Raum erstellen
+                </button>
             </form>
             
             <div class="search-box">
-                <input type="text" id="codeInp" placeholder="Privater Code" maxlength="5">
-                <button onclick="checkCode()" class="game-btn join-btn">Suchen & Beitreten</button>
+                <input type="text" id="privateCode" placeholder="Privater Code..." maxlength="5">
+                <button onclick="checkCode()" class="game-btn join-btn">Beitreten</button>
             </div>
         </div>
 
+        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
         <div class="room-list-container">
-            <h3>Offene Räume</h3>
+            <h3 class="list-headline"><i class="fas fa-globe"></i> Offene Lobbys</h3>
             <ul id="roomList">
-                {% for r in public_rooms %}
-                <li class="room-item">
-                    <span>{{ r.name }} ({{ r.host.username }})</span>
-                    <a href="{{ url_for('multiplayer_layout', room_id=r.id) }}">Beitreten</a>
-                </li>
-                {% endfor %}
+                {% if public_rooms %}
+                    {% for room in public_rooms %}
+                    <li class="room-item" id="room-{{ room.id }}">
+                        <span class="room-info">
+                            <strong>{{ room.name }}</strong> 
+                            <small>(Host: {{ room.host.username }})</small>
+                        </span>
+                        <a href="{{ url_for('multiplayer_layout', room_id=room.id) }}" class="join-link">Eintreten</a>
+                    </li>
+                    {% endfor %}
+                {% else %}
+                    <p id="noRooms" style="opacity: 0.6; margin-top: 20px;">Gerade keine öffentlichen Räume aktiv.</p>
+                {% endif %}
             </ul>
         </div>
     </div>
@@ -38,30 +58,75 @@
 <script>
     const socket = io();
 
-    // Echtzeit-Update: Neuer Raum erscheint sofort
+    // 1. Echtzeit: Neuen Raum zur Liste hinzufügen
     socket.on('new_public_room', function(data) {
+        const noRoomsMsg = document.getElementById('noRooms');
+        if (noRoomsMsg) noRoomsMsg.remove();
+
         const list = document.getElementById('roomList');
+        
+        // Verhindern, dass der Raum doppelt erscheint
+        if (document.getElementById(`room-${data.id}`)) return;
+
         const li = document.createElement('li');
         li.className = 'room-item';
-        li.innerHTML = `<span>${data.name} (${data.host})</span><a href="/multiplayer/layout/${data.id}">Beitreten</a>`;
+        li.id = `room-${data.id}`;
+        li.innerHTML = `
+            <span class="room-info"><strong>${data.name}</strong> <small>(Host: ${data.host})</small></span>
+            <a href="/multiplayer/layout/${data.id}" class="join-link">Eintreten</a>
+        `;
         list.prepend(li);
     });
 
+    // 2. Echtzeit: Raum entfernen, wenn er auf dem Server gelöscht wurde
+    socket.on('room_closed', function(data) {
+        const roomEl = document.getElementById(`room-${data.room_id}`);
+        if (roomEl) {
+            // Kleiner visueller Effekt beim Entfernen
+            roomEl.style.transition = "all 0.4s ease";
+            roomEl.style.opacity = "0";
+            roomEl.style.transform = "scale(0.9)";
+            
+            setTimeout(() => {
+                roomEl.remove();
+                // Wenn die Liste nun leer ist, Nachricht wieder einblenden
+                const list = document.getElementById('roomList');
+                if (list && list.children.length === 0) {
+                    list.innerHTML = '<p id="noRooms" style="opacity: 0.6; margin-top: 20px;">Gerade keine öffentlichen Räume aktiv.</p>';
+                }
+            }, 400);
+        }
+    });
+
+    // Suche nach privaten Räumen via Code
     function checkCode() {
-        const code = document.getElementById('codeInp').value;
+        const codeInput = document.getElementById('privateCode');
+        const code = codeInput.value.trim();
+        
+        if (code.length === 0) return;
+
         fetch('/api/find_room', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}'},
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': "{{ csrf_token() }}"
+            },
             body: JSON.stringify({code: code})
         })
-        .then(r => r.json())
+        .then(res => res.json())
         .then(data => {
             if(data.success) {
                 window.location.href = "/multiplayer/layout/" + data.room_id;
             } else {
-                alert("Code falsch oder Raum existiert nicht.");
+                // Nutzt die Flash-Funktion deiner base.html
+                if (typeof createFlashMessage === 'function') {
+                    createFlashMessage("Raum nicht gefunden oder Code falsch.", "error");
+                } else {
+                    alert("Raum nicht gefunden.");
+                }
             }
-        });
+        })
+        .catch(err => console.error("Fehler bei Raumsuche:", err));
     }
 </script>
 {% endblock %}

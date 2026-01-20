@@ -1,20 +1,36 @@
 {% extends "base.html" %}
+
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_multiplayer.css') }}"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 {% endblock %}
 
 {% block body %}
 <div class="multiplayer-page">
+    <div class="header-controls">
+        <a href="{{ url_for('multiplayer_menu') }}" class="back-button sound-button">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
     <div class="glass-card">
-        <h2>Raum konfigurieren</h2>
-        <form method="POST">
+        <h1 class="title">Einstellungen</h1>
+        <form method="POST" class="settings-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="setting-group">
-                <p>Wie soll dein Raum gelistet werden?</p>
-                <label><input type="radio" name="room_type" value="public" checked> Öffentlich</label>
-                <label><input type="radio" name="room_type" value="private"> Privat (nur mit Code)</label>
+                <p>Sichtbarkeit des Raums:</p>
+                <div class="radio-options">
+                    <label class="radio-btn">
+                        <input type="radio" name="room_type" value="public" checked>
+                        <span>Öffentlich</span>
+                    </label>
+                    <label class="radio-btn">
+                        <input type="radio" name="room_type" value="private">
+                        <span>Privat</span>
+                    </label>
+                </div>
             </div>
-            <button type="submit" class="game-btn start-btn">Raum starten</button>
+            <button type="submit" class="game-btn start-btn">Raum eröffnen</button>
         </form>
     </div>
 </div>

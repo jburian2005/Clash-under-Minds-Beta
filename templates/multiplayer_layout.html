@@ -1,22 +1,37 @@
 {% extends "base.html" %}
+
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_multiplayer.css') }}"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 {% endblock %}
 
 {% block body %}
 <div class="multiplayer-page">
-    <div class="glass-card">
-        <h1>Raum: {{ room.name }}</h1>
-        {% if room.is_private %}
-            <div class="code-badge">EINLADUNGSCODE: {{ room.code }}</div>
-        {% endif %}
-        
-        <div id="playerStatus" style="margin-top: 20px; color: #00ff00;">
-            Warte auf Synchronisation...
+    <div class="header-controls">
+        <a href="{{ url_for('multiplayer_menu') }}" class="back-button sound-button">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+    <div class="glass-card layout-card">
+        <div class="room-header">
+            <h1>{{ room.name }}</h1>
+            {% if room.is_private %}
+                <div class="code-badge">EINLADUNGSCODE: {{ room.code }}</div>
+            {% endif %}
         </div>
 
-        <div class="game-area" style="min-height: 200px; margin-top: 30px; border: 1px dashed rgba(255,255,255,0.2);">
-            <p>Spielinhalt wird geladen...</p>
+        <div class="game-content">
+            <div class="player-sidebar">
+                <h3>Crew-Mitglieder</h3>
+                <ul id="activePlayers">
+                    <li><i class="fas fa-user-astronaut"></i> {{ room.host.username }} (Host)</li>
+                </ul>
+            </div>
+            
+            <div class="main-play-area">
+                <p>Warte auf Spielstart...</p>
+            </div>
         </div>
     </div>
 </div>
@@ -29,10 +44,10 @@
     socket.emit('join_multiplayer_room', { room_id: roomId });
 
     socket.on('status', function(data) {
-        const statusDiv = document.getElementById('playerStatus');
-        const p = document.createElement('p');
-        p.textContent = data.msg;
-        statusDiv.appendChild(p);
+        const list = document.getElementById('activePlayers');
+        const li = document.createElement('li');
+        li.innerHTML = `<i class="fas fa-user-astronaut"></i> ${data.msg}`;
+        list.appendChild(li);
     });
 </script>
 {% endblock %}

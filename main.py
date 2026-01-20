@@ -3014,28 +3014,63 @@ def find_room():
 
 # --- SocketIO Events (im Bereich der Sockets einfügen) ---
 
+# --- Globaler Tracker (außerhalb der Funktionen) ---
+room_occupants = {} 
+
 @socketio.on('join_multiplayer_room')
 def handle_join_multiplayer(data):
-    room_id = data.get('room_id')
-    if room_id:
+    room_id = str(data.get('room_id'))
+    username = session.get('username')
+    
+    if room_id and username:
         join_room(room_id)
-        print(f"User {session.get('username')} joined room {room_id}")
-        emit('status', {'msg': f"{session.get('username')} ist beigetreten."}, room=room_id)
+        
+        # Wir speichern die ID in der Session, damit der Server beim 
+        # Disconnect weiß, aus welchem Raum dieser User gelöscht werden muss.
+        session['active_room_id'] = room_id
+        
+        if room_id not in room_occupants:
+            room_occupants[room_id] = set()
+        room_occupants[room_id].add(username)
+        
+        emit('status', {'msg': f"{username} ist beigetreten."}, room=room_id)
 
+@socketio.on('disconnect')
+def handle_disconnect():
+    # Hier holen wir die ID wieder raus
+    room_id = session.get('active_room_id')
+    username = session.get('username')
+    
+    if room_id:
+        if room_id in room_occupants:
+            # User aus dem Tracker entfernen
+            room_occupants[room_id].discard(username)
+            
+            print(f"DEBUG: User {username} verlässt Raum {room_id}. Verbleibend: {len(room_occupants[room_id])}")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+            # PRÜFUNG: Ist der Raum jetzt leer?
+            if len(room_occupants[room_id]) == 0:
+                if room_id in room_occupants:
+                    del room_occupants[room_id]
+                
+                # Datenbank-Löschung in sauberem Kontext
+                with app.app_context():
+                    try:
+                        # Wir suchen den Raum in der DB
+                        room_to_delete = Room.query.get(room_id)
+                        if room_to_delete:
+                            db.session.delete(room_to_delete)
+                            db.session.commit()
+                            
+                            # WICHTIG: Signal an alle in der Lobby senden
+                            socketio.emit('room_closed', {'room_id': room_id})
+                            print(f"ERFOLG: Raum {room_id} wurde gelöscht, da er leer ist.")
+                    except Exception as e:
+                        db.session.rollback()
+                        print(f"FEHLER beim Löschen: {e}")
+        
+        # Session-Eintrag für diesen Socket aufräumen
+        session.pop('active_room_id', None)
 
 
 
@@ -3245,6 +3280,18 @@ def handle_submit_answer(data):
 # ============================================
 
 if __name__ == '__main__':
+    with app.app_context():
+    # Löscht beim Server-Start alle Räume, da nach einem Neustart 
+    # sowieso keine aktiven Socket-Verbindungen mehr bestehen.
+        try:
+            num_deleted = db.session.query(Room).delete()
+            db.session.commit()
+            if num_deleted > 0:
+                print(f"INFO: {num_deleted} alte Räume beim Start bereinigt.")
+        except Exception as e:
+            db.session.rollback()
+
+
     port = int(os.environ.get('PORT', 5000))
     
     # In Production: verwende den Port von der Environment Variable
@@ -3252,8 +3299,3 @@ if __name__ == '__main__':
         socketio.run(app, host='0.0.0.0', port=port)
     else:
         socketio.run(app, host='0.0.0.0', port=port, debug=True)
-
-
-
-
-        # blabla
