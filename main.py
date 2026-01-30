@@ -3014,8 +3014,64 @@ def find_room():
 
 # --- SocketIO Events (im Bereich der Sockets einfügen) ---
 
-# --- Globaler Tracker (außerhalb der Funktionen) ---
-room_occupants = {} 
+
+
+
+
+# ============================================
+# MULTIPLAYER MEMORY & CLEANUP (HEARTBEAT)
+# ============================================
+
+# Memory-Strukturen für aktives Tracking
+sid_to_room = {}  # Mapping: Socket-ID -> Raum-ID
+room_occupants = {}  # Mapping: Raum-ID -> Set von aktiven Socket-IDs
+
+def cleanup_empty_rooms():
+    """
+    Hintergrund-Wächter: Prüft alle 5 Sekunden die Datenbank gegen den Speicher.
+    Wenn ein Raum in der DB existiert, aber keine aktiven Sockets (Lebenszeichen) sendet,
+    wird er gelöscht.
+    """
+    with app.app_context():
+        while True:
+            sleep(5)  # Prüf-Intervall
+            try:
+                # Alle Räume aus der DB holen
+                all_db_rooms = Room.query.all()
+                
+                for room in all_db_rooms:
+                    # Prüfen: Ist der Raum im RAM bekannt UND hat er aktive Insassen?
+                    has_active_players = (room.id in room_occupants and len(room_occupants[room.id]) > 0)
+                    
+                    if not has_active_players:
+                        # SCHUTZ: Gib neuen Räumen 900 Sekunden (15 Minutne) Zeit, damit der Host connecten kann
+                        # (Verhindert Löschung während des Redirects nach Erstellung)
+                        created_at = room.created_at
+                        if created_at.tzinfo is None:
+                            created_at = created_at.replace(tzinfo=timezone.utc)
+                            
+                        age_seconds = (datetime.now(timezone.utc) - created_at).total_seconds()
+                        
+                        if age_seconds > 900:
+                            print(f"💀 CLEANUP: Lösche toten Raum {room.id} (Keine aktiven Spieler)")
+                            
+                            # Aus DB löschen
+                            db.session.delete(room)
+                            db.session.commit()
+                            
+                            # Signal an Lobby senden, damit er aus der Liste verschwindet
+                            socketio.emit('room_closed', {'room_id': room.id})
+                            
+                            # Speicher bereinigen falls noch Reste da sind
+                            if room.id in room_occupants:
+                                del room_occupants[room.id]
+                                
+            except Exception as e:
+                db.session.rollback()
+                print(f"Fehler im Cleanup-Task: {e}")
+
+# Starte den Wächter-Task im Hintergrund
+spawn(cleanup_empty_rooms)
 
 @socketio.on('join_multiplayer_room')
 def handle_join_multiplayer(data):
@@ -3025,56 +3081,40 @@ def handle_join_multiplayer(data):
     if room_id and username:
         join_room(room_id)
         
-        # Wir speichern die ID in der Session, damit der Server beim 
-        # Disconnect weiß, aus welchem Raum dieser User gelöscht werden muss.
-        session['active_room_id'] = room_id
+        # 1. Socket dem Raum zuordnen (Middleware Memory)
+        sid_to_room[request.sid] = room_id
         
+        # 2. Raum-Set initialisieren falls nicht vorhanden
         if room_id not in room_occupants:
             room_occupants[room_id] = set()
-        room_occupants[room_id].add(username)
+            
+        # 3. Socket-ID als "Lebenszeichen" speichern
+        room_occupants[room_id].add(request.sid)
         
         emit('status', {'msg': f"{username} ist beigetreten."}, room=room_id)
+        print(f"JOIN: {username} (SID: {request.sid}) -> Raum {room_id}")
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    # Hier holen wir die ID wieder raus
-    room_id = session.get('active_room_id')
-    username = session.get('username')
+    # 1. Quiz-Logik (Bestehend)
+    if request.sid in socket_rooms:
+        quiz_room_id = socket_rooms[request.sid]
+        leave_room(quiz_room_id)
+        del socket_rooms[request.sid]
+
+    # 2. Multiplayer-Logik
+    # Wir entfernen hier nur den Spieler aus dem RAM.
+    # Das eigentliche Löschen des Raumes übernimmt jetzt der cleanup_empty_rooms Task.
+    room_id = sid_to_room.get(request.sid)
     
     if room_id:
-        if room_id in room_occupants:
-            # User aus dem Tracker entfernen
-            room_occupants[room_id].discard(username)
-            
-            print(f"DEBUG: User {username} verlässt Raum {room_id}. Verbleibend: {len(room_occupants[room_id])}")
-
-            # PRÜFUNG: Ist der Raum jetzt leer?
-            if len(room_occupants[room_id]) == 0:
-                if room_id in room_occupants:
-                    del room_occupants[room_id]
-                
-                # Datenbank-Löschung in sauberem Kontext
-                with app.app_context():
-                    try:
-                        # Wir suchen den Raum in der DB
-                        room_to_delete = Room.query.get(room_id)
-                        if room_to_delete:
-                            db.session.delete(room_to_delete)
-                            db.session.commit()
-                            
-                            # WICHTIG: Signal an alle in der Lobby senden
-                            socketio.emit('room_closed', {'room_id': room_id})
-                            print(f"ERFOLG: Raum {room_id} wurde gelöscht, da er leer ist.")
-                    except Exception as e:
-                        db.session.rollback()
-                        print(f"FEHLER beim Löschen: {e}")
+        # Mapping entfernen
+        del sid_to_room[request.sid]
         
-        # Session-Eintrag für diesen Socket aufräumen
-        session.pop('active_room_id', None)
-
-
-
-
+        # Aus der Insassen-Liste entfernen
+        if room_id in room_occupants:
+            room_occupants[room_id].discard(request.sid)
+            print(f"LEAVE: SID {request.sid} aus Raum {room_id} entfernt.")
 
 
 
