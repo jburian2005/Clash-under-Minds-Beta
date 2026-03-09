@@ -29,7 +29,12 @@ Rechtliche Informationen-Seite enthält:
                 </div>
                 <div class="info-row">
                     <span class="info-label">Version:</span>
-                    <span class="info-value">202601-000669</span>
+                    <span class="info-value">202603-000670
+                        <button id="versionInfoBtn" class="version-info-btn" title="Versionsdetails anzeigen">
+                            <i class="fas fa-info-circle"></i>
+                            <!-- NICHT VERGESSEN POPUP ANPASSEN-->
+                        </button>
+                    </span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Versionsstand:</span>
@@ -62,6 +67,24 @@ Rechtliche Informationen-Seite enthält:
                 <button class="setting-toggle">🔒 Datenschutzerklärung <i class="fas fa-chevron-down"></i></button>
                 <div class="setting-content">
                     {% include 'privacy_content.html' %} <!-- Externe Datenschutz-Datei einbinden -->
+                </div>
+            </div>
+        </div>
+
+        <div id="versionModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>📌 Versionsinformationen</h3>
+                <p><strong>Version:</strong> 202603-000670</p>
+                <p><strong>Update:</strong> 670</p>
+                <p><strong>Veröffentlicht:</strong> 05.03.2026</p>
+                <div class="version-changes">
+                    <strong>Letzte Änderung:</strong>
+                    <ul>
+                        <li>Multiplayer-Modus mit Echtzeit-Synchronisation (WebSockets)</li>
+                        <li>Räume können privat oder öffentlich erstellt werden</li>
+                        <li>Inaktive Räume werden nach 15 Minuten automatisch bereinigt</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -113,6 +136,35 @@ document.addEventListener("DOMContentLoaded", function() {
         c.classList.remove('open');
     });
 });
+
+// ===============================
+// VERSIONS-MODAL LOGIK
+// ===============================
+const versionModal = document.getElementById('versionModal');
+const versionBtn = document.getElementById('versionInfoBtn');
+const closeSpan = versionModal ? versionModal.querySelector('.close') : null;
+
+if (versionBtn && versionModal) {
+    // Öffnen
+    versionBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        versionModal.style.display = 'block';
+    });
+
+    // Schließen über X
+    if (closeSpan) {
+        closeSpan.addEventListener('click', function() {
+            versionModal.style.display = 'none';
+        });
+    }
+
+    // Schließen durch Klick außerhalb des Modalinhalts
+    window.addEventListener('click', function(event) {
+        if (event.target === versionModal) {
+            versionModal.style.display = 'none';
+        }
+    });
+}
 </script>
 
 {% endblock %}
