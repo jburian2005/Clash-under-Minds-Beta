@@ -1,0 +1,129 @@
+/* =======================
+   6. VERSIONS-INFO BUTTON
+   =======================
+*/
+.version-info-btn {
+    background: none;
+    border: none;
+    color: #4a00e0;            /* Blau passend zur Akzentfarbe */
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-left: 8px;
+    vertical-align: middle;
+    padding: 4px;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.version-info-btn:hover {
+    color: #7d3dfc;             /* Helleres Blau beim Hover */
+    transform: scale(1.1);
+}
+
+/* =======================
+   7. MODAL (POPUP)
+   =======================
+*/
+.modal {
+    display: none;              /* Standardmäßig versteckt */
+    position: fixed;
+    z-index: 11000;             /* Über allen anderen Elementen */
+    inset: 0;
+    background-color: rgba(0,0,0,0.7); /* Halbtransparenter Hintergrund */
+    backdrop-filter: blur(3px); /* Weicher Unschärfeeffekt (optional) */
+
+    align-items: center;          /* vertikal zentriert */
+    justify-content: center;      /* horizontal zentriert */
+
+    padding: 20px;                /* verhindert Randabschneiden auf Mobile */
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    margin: 10% auto;           /* 10% Abstand von oben, zentriert */
+    padding: 25px 30px;
+    border: 2px solid #2a6fff;
+    border-radius: 16px;
+
+    width: 90%;
+    max-width: 420px;
+    max-height: 90vh;             /* verhindert dass Modal zu groß wird */
+
+    overflow-y: auto;             /* Scroll wenn Inhalt zu groß */
+    color: #f0f4f8;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    position: relative;
+
+    animation: fadeInModal 0.3s ease-out;
+}
+
+/* Mobile Anpassung */
+@media (max-width: 480px) {
+    .modal-content {
+        padding: 20px;
+        border-radius: 12px;
+    }
+}
+
+@keyframes fadeInModal {
+    from { opacity: 0; transform: translateY(-15px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Close Button */
+.modal-content .close {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 16px;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-content .close:hover {
+    color: white;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color: #61a8ff;
+    border-bottom: 1px solid #2a6fff;
+    padding-bottom: 10px;
+}
+
+/* Normale Infos */
+.modal-content p {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+    flex-wrap: wrap;
+}
+
+.modal-content strong {
+    min-width: 130px;
+    color: white;
+}
+
+/* =======================
+   LETZTE ÄNDERUNG LISTE
+   ======================= */
+
+.version-changes {
+    margin-top: 15px;
+}
+
+.version-changes strong {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.version-changes ul {
+    padding-left: 20px;
+    margin: 0;
+}
+
+.version-changes li {
+    margin-bottom: 6px;
+    line-height: 1.4;
+}

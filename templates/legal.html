@@ -1,21 +1,17 @@
-{% extends "base.html" %} <!-- Erbt von Basis-Template -->
-
-<!--
-Rechtliche Informationen-Seite enthält:
-    1. Daten zum Spiel
-    2. Logo
-    3. Akkordeon für AGB und Datenschutzerklärung
--->
+{% extends "base.html" %}
 
 {% block head %}
-    <!-- Seiten-spezifisches Stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_legal.css') }}"/>
-    <!-- Font Awesome für Icons -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_version_content.css') }}"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 {% endblock %}
 
 {% block body %}
 <div class="page-wrapper">
+    {# ===== Alle versionsbezogenen Daten und das Modal werden hier eingebunden ===== #}
+    {% set version_data = namespace() %}
+    {% include 'version_content.html' %}
+
     <div class="legal-box">
         <h1 class="legal-title">Rechtliche Informationen</h1>
 
@@ -29,16 +25,15 @@ Rechtliche Informationen-Seite enthält:
                 </div>
                 <div class="info-row">
                     <span class="info-label">Version:</span>
-                    <span class="info-value">202603-000670
+                    <span class="info-value">{{ version_data.version }}
                         <button id="versionInfoBtn" class="version-info-btn" title="Versionsdetails anzeigen">
                             <i class="fas fa-info-circle"></i>
-                            <!-- NICHT VERGESSEN POPUP ANPASSEN-->
                         </button>
                     </span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Versionsstand:</span>
-                    <span class="info-value">30.01.2026</span>
+                    <span class="info-value">{{ version_data.version_published }}</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Entwickler:</span>
@@ -54,37 +49,16 @@ Rechtliche Informationen-Seite enthält:
 
         <!-- AKKORDEON FÜR RECHTSDOKUMENTE -->
         <div class="settings-list">
-            <!-- 1. ABSCHNITT: ALLGEMEINE GESCHÄFTSBEDINGUNGEN -->
             <div class="setting-item">
                 <button class="setting-toggle">🧾 AGB <i class="fas fa-chevron-down"></i></button>
                 <div class="setting-content">
-                    {% include 'agb_content.html' %} <!-- Externe AGB-Datei einbinden -->
+                    {% include 'agb_content.html' %}
                 </div>
             </div>
-
-            <!-- 2. ABSCHNITT: DATENSCHUTZERKLÄRUNG -->
             <div class="setting-item">
                 <button class="setting-toggle">🔒 Datenschutzerklärung <i class="fas fa-chevron-down"></i></button>
                 <div class="setting-content">
-                    {% include 'privacy_content.html' %} <!-- Externe Datenschutz-Datei einbinden -->
-                </div>
-            </div>
-        </div>
-
-        <div id="versionModal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h3>📌 Versionsinformationen</h3>
-                <p><strong>Version:</strong> 202603-000670</p>
-                <p><strong>Update:</strong> 670</p>
-                <p><strong>Veröffentlicht:</strong> 05.03.2026</p>
-                <div class="version-changes">
-                    <strong>Letzte Änderung:</strong>
-                    <ul>
-                        <li>Multiplayer-Modus mit Echtzeit-Synchronisation (WebSockets)</li>
-                        <li>Räume können privat oder öffentlich erstellt werden</li>
-                        <li>Inaktive Räume werden nach 15 Minuten automatisch bereinigt</li>
-                    </ul>
+                    {% include 'privacy_content.html' %}
                 </div>
             </div>
         </div>
@@ -96,75 +70,40 @@ Rechtliche Informationen-Seite enthält:
     </div>
 </div>
 
+<!-- Das Akkordeon-JavaScript bleibt hier, da es nur für legal.html relevant ist -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    // ===============================
-    // AKKORDEON-LOGIK FÜR RECHTSDOKUMENTE
-    // ===============================
+    // Akkordeon-Logik
     const toggles = document.querySelectorAll(".setting-toggle");
     
     toggles.forEach(toggle => {
         toggle.addEventListener("click", function () {
             const content = this.nextElementSibling;
             const icon = this.querySelector("i");
-            const isOpen = content.classList.contains("open"); // Prüft ob bereits geöffnet
+            const isOpen = content.classList.contains("open");
 
-            // Schließe alle anderen geöffneten Abschnitte
             document.querySelectorAll(".setting-content.open").forEach(c => {
                 if (c !== content) {
-                    c.classList.remove("open"); // Entfernt 'open'-Klasse
+                    c.classList.remove("open");
                     const otherIcon = c.previousElementSibling.querySelector("i");
-                    if (otherIcon) otherIcon.style.transform = "rotate(0deg)"; // Icon zurücksetzen
+                    if (otherIcon) otherIcon.style.transform = "rotate(0deg)";
                 }
             });
 
-            // Öffne/Schließe den angeklickten Abschnitt
             if (isOpen) {
                 content.classList.remove("open");
                 if (icon) icon.style.transform = "rotate(0deg)";
             } else {
-                content.classList.add("open"); // CSS regelt die Animation über max-height
-                if (icon) icon.style.transform = "rotate(180deg)"; // Icon drehen
+                content.classList.add("open");
+                if (icon) icon.style.transform = "rotate(180deg)";
             }
         });
     });
 
-    // ===============================
-    // ALLE ABSCHNITTE GESCHLOSSEN
-    // ===============================
+    // Alle Abschnitte geschlossen starten
     document.querySelectorAll('.setting-content').forEach(c => {
         c.classList.remove('open');
     });
 });
-
-// ===============================
-// VERSIONS-MODAL LOGIK
-// ===============================
-const versionModal = document.getElementById('versionModal');
-const versionBtn = document.getElementById('versionInfoBtn');
-const closeSpan = versionModal ? versionModal.querySelector('.close') : null;
-
-if (versionBtn && versionModal) {
-    // Öffnen
-    versionBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        versionModal.style.display = 'block';
-    });
-
-    // Schließen über X
-    if (closeSpan) {
-        closeSpan.addEventListener('click', function() {
-            versionModal.style.display = 'none';
-        });
-    }
-
-    // Schließen durch Klick außerhalb des Modalinhalts
-    window.addEventListener('click', function(event) {
-        if (event.target === versionModal) {
-            versionModal.style.display = 'none';
-        }
-    });
-}
 </script>
-
 {% endblock %}

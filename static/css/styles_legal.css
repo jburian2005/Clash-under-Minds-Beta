@@ -306,11 +306,11 @@ html, body {
 /* =======================
    6. VERSIONS-INFO BUTTON
    =======================
-*/
+
 .version-info-btn {
     background: none;
     border: none;
-    color: #4a00e0;            /* Blau passend zur Akzentfarbe */
+    color: #4a00e0;            /* Blau passend zur Akzentfarbe 
     font-size: 1.1rem;
     cursor: pointer;
     margin-left: 8px;
@@ -320,7 +320,7 @@ html, body {
 }
 
 .version-info-btn:hover {
-    color: #7d3dfc;             /* Helleres Blau beim Hover */
+    color: #7d3dfc;             /* Helleres Blau beim Hover 
     transform: scale(1.1);
 }
 
@@ -337,34 +337,34 @@ html, body {
 /* =======================
    7. MODAL (POPUP)
    =======================
-*/
+
 .modal {
-    display: none;              /* Standardmäßig versteckt */
+    display: none;              /* Standardmäßig versteckt 
     position: fixed;
-    z-index: 11000;             /* Über allen anderen Elementen */
+    z-index: 11000;             /* Über allen anderen Elementen 
     inset: 0;
-    background-color: rgba(0,0,0,0.7); /* Halbtransparenter Hintergrund */
-    backdrop-filter: blur(3px); /* Weicher Unschärfeeffekt (optional) */
+    background-color: rgba(0,0,0,0.7); /* Halbtransparenter Hintergrund 
+    backdrop-filter: blur(3px); /* Weicher Unschärfeeffekt (optional) 
 
     display: flex;
-    align-items: center;          /* vertikal zentriert */
-    justify-content: center;      /* horizontal zentriert */
+    align-items: center;          /* vertikal zentriert 
+    justify-content: center;      /* horizontal zentriert 
 
-    padding: 20px;                /* verhindert Randabschneiden auf Mobile */
+    padding: 20px;                /* verhindert Randabschneiden auf Mobile 
 }
 
 .modal-content {
     background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    margin: 10% auto;           /* 10% Abstand von oben, zentriert */
+    margin: 10% auto;           /* 10% Abstand von oben, zentriert 
     padding: 25px 30px;
     border: 2px solid #2a6fff;
     border-radius: 16px;
 
     width: 90%;
     max-width: 420px;
-    max-height: 90vh;             /* verhindert dass Modal zu groß wird */
+    max-height: 90vh;             /* verhindert dass Modal zu groß wird 
 
-    overflow-y: auto;             /* Scroll wenn Inhalt zu groß */
+    overflow-y: auto;             /* Scroll wenn Inhalt zu groß 
     color: #f0f4f8;
 
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -373,7 +373,7 @@ html, body {
     animation: fadeInModal 0.3s ease-out;
 }
 
-/* Mobile Anpassung */
+/* Mobile Anpassung 
 @media (max-width: 480px) {
     .modal-content {
         padding: 20px;
@@ -386,7 +386,7 @@ html, body {
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Close Button */
+/* Close Button 
 .modal-content .close {
     color: #aaa;
     position: absolute;
@@ -408,7 +408,7 @@ html, body {
     padding-bottom: 10px;
 }
 
-/* Normale Infos */
+/* Normale Infos 
 .modal-content p {
     display: flex;
     gap: 10px;
@@ -423,7 +423,7 @@ html, body {
 
 /* =======================
    LETZTE ÄNDERUNG LISTE
-   ======================= */
+   ======================= 
 
 .version-changes {
     margin-top: 15px;

@@ -1,0 +1,60 @@
+{# ============================================
+   Zentrale Versionsdaten – hier nur einmal pflegen!
+   ============================================ #}
+{% set version_data.version = "202603-000671" %} <!-- Version -->
+{% set version_data.version_build = "671" %} <!-- Update -->
+{% set version_data.version_published = "13.03.2026" %} <!-- Veröffentlicht -->
+
+<!-- VERSIONS-MODAL -->
+<div id="versionModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3>📌 Versionsinformationen</h3>
+        <p><strong>Version:</strong> {{ version_data.version }}</p>
+        <p><strong>Update:</strong> {{ version_data.version_build }}</p>
+        <p><strong>Veröffentlicht:</strong> {{ version_data.version_published }}</p>
+        <div class="version-changes">
+            <strong>Letzte Änderung:</strong>
+            <ul>
+                <li>Versionsübersicht angepasst und erweitert </li>
+                <li>Multiplayer-Modus mit Echtzeit-Synchronisation </li>
+                <li>Räume können privat oder öffentlich erstellt werden</li>
+                <li>Inaktive Räume werden nach 15 Minuten gelöscht</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const versionModal = document.getElementById('versionModal');
+    const versionBtn = document.getElementById('versionInfoBtn');
+
+    if (!versionModal || !versionBtn) {
+        console.warn('Versions-Modal oder Button nicht gefunden.');
+        return;
+    }
+
+    const closeSpan = versionModal.querySelector('.close');
+
+    // Öffnen
+    versionBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        versionModal.style.display = 'flex'; // Flex aktivieren (wie im CSS vorgesehen)
+    });
+
+    // Schließen über X
+    if (closeSpan) {
+        closeSpan.addEventListener('click', function() {
+            versionModal.style.display = 'none';
+        });
+    }
+
+    // Schließen durch Klick außerhalb
+    window.addEventListener('click', function(event) {
+        if (event.target === versionModal) {
+            versionModal.style.display = 'none';
+        }
+    });
+});
+</script>
