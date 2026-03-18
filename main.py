@@ -1228,8 +1228,12 @@ def change_avatar():
         if not user.check_password(password):
             return jsonify({"success": False, "error": "Falsches Passwort!"})
 
-        # Validieren, dass der Avatar existiert
+        # Liste aller Standard-Avatare (avatar0.png bis avatar25.png)
         valid_avatars = [f"avatar{i}.png" for i in range(26)]
+        # Falls der Benutzer ein Admin ist, darf er zusätzlich den Support-Avatar verwenden
+        if user.is_admin:
+            valid_avatars.append("avatar-support.png")
+        # Überprüfen, ob der ausgewählte Avatar in der erlaubten Liste enthalten ist
         if avatar not in valid_avatars:
             return jsonify({"success": False, "error": "Ungültiger Avatar!"})
 
@@ -1360,6 +1364,7 @@ def playermenu():
         return render_template(
             'playermenu.html',
             username=user.username,
+            is_admin=user.is_admin,
             avatar=avatar,
             first_played=user.first_played,
             highscore=user.highscore,
@@ -1385,8 +1390,16 @@ def update_avatar():
         if not avatar:
             return jsonify({"success": False, "error": "Kein Avatar ausgewählt!"})
 
-        # Validieren, dass der Avatar existiert
+        # Liste aller Standard-Avatare (avatar0.png bis avatar25.png)
         valid_avatars = [f"avatar{i}.png" for i in range(26)]
+        # Aktuell eingeloggten Benutzer aus der Session laden
+        user = User.query.filter_by(username=session.get('username')).first()
+        if not user:
+            return jsonify({"success": False, "error": "Benutzer nicht gefunden!"})
+        # Falls der Benutzer ein Admin ist, darf er zusätzlich den Support-Avatar verwenden
+        if user.is_admin:
+            valid_avatars.append("avatar-support.png")
+        # Überprüfen, ob der ausgewählte Avatar erlaubt ist
         if avatar not in valid_avatars:
             return jsonify({"success": False, "error": "Ungültiger Avatar!"})
 

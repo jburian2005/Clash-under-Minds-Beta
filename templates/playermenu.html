@@ -169,6 +169,9 @@ Spielermenü-Seite enthält:
     // 3. Modal-Steuerung
 
     document.addEventListener("DOMContentLoaded", () => {
+        // Admin-Status aus Template
+        const isAdmin = ('{{ is_admin }}' === 'True');
+
         // DOM-Element-Referenzen
         const modal = document.getElementById("avatar-modal");
         const openBtn = document.getElementById("open-avatar-modal");
@@ -188,7 +191,7 @@ Spielermenü-Seite enthält:
         let selectedAvatar = null;
         let currentAvatarIndex = 0;
         let avatars = [];
-        const totalAvatarCount = 26;
+        const totalAvatarCount = isAdmin ? 27 : 26;
 
         // CSRF-Token für API-Anfragen
         const csrfToken = "{{ csrf_token() }}";
@@ -205,9 +208,15 @@ Spielermenü-Seite enthält:
         // Event Listener für Bearbeiten-Button
         openBtn.addEventListener("click", openAvatarModal);
 
-        // Lädt alle verfügbaren Avatare
+         // Lädt alle verfügbaren Avatare
         function loadAllAvatars() {
-            return Array.from({length: totalAvatarCount}, (_, i) => `avatar${i}.png`);
+            // Standard-Avatare avatar0.png bis avatar25.png
+            const stdAvatars = Array.from({length: 26}, (_, i) => `avatar${i}.png`);
+            if (isAdmin) {
+                // Admin erhält zusätzlich den Support-Avatar
+                return [...stdAvatars, "avatar-support.png"];
+            }
+            return stdAvatars;
         }
 
         // Berechnet die sichtbaren Avatare basierend auf Gerätetyp
