@@ -698,8 +698,8 @@ def initialize_database():
 
             # ADMIN-BENUTZER ERSTELLEN
             # Admin-Zugangsdaten aus Umgebungsvariablen holen (oder Standardwerte verwenden)
-            admin_username = os.environ.get('ADMIN_USERNAME', 'AdminZugang')
-            admin_password = os.environ.get('ADMIN_PASSWORD', 'adminzugang')
+            admin_username = os.environ.get('ADMIN_USERNAME', 'AdminLogin')
+            admin_password = os.environ.get('ADMIN_PASSWORD', 'Login1234!')
 
             # Prüfen ob Admin bereits existiert
             admin_user = User.query.filter_by(username=admin_username).first()
