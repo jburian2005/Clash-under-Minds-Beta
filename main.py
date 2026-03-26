@@ -617,60 +617,53 @@ def initialize_database():
             print("Prüfe Test-News...")
             # Liste von News-Einträgen für die Anwendung
             test_news = [
-                # 1. News: Bedanken für Feedback (20.12.2025)
+                # 1. News: Multiplayer Release info (26.03.2026)
                 {
-                    'title': 'Update: Wir hören euch zu!',
-                    'content': 'Liebe Community, vielen Dank für euer wertvolles Feedback! Wir arbeiten mit Hochdruck daran, Clash under Minds für euch zu perfektionieren. <br><br><b>Das ist neu:</b> Wir haben das <b>Design für alle Endgeräte optimiert</b> und Anzeige-Fehler behoben. Zudem ist euer Fortschritt ab jetzt sicher: Zukünftige Updates werden <b>keinen Datenverlust</b> mehr verursachen! <br><br><b>Stetige Verbesserung:</b> Wir <b>erhöhen kontinuierlich die Anzahl der Fragen</b>, damit es nie langweilig wird. Parallel arbeiten wir bereits an der Einbindung des <b>Multiplayer-Modus</b> und einem neuen <b>Start-Intro</b>. <br><br>Habt ihr weitere Ideen? Schreibt uns einfach über das <a href="/tickets" style="color: #6cf; text-decoration: underline;">Ticketsystem</a>. Gemeinsam machen wir das Quiz noch besser!',
-                    'created_at': datetime(2025, 12, 20, 10, 0, tzinfo=timezone.utc)
+                    'title': '💥 Update zum Multiplayer-Modus: Release-News & neue Features',
+                    'content': 'Hallo zusammen! Wir arbeiten unter Hochdruck daran, das Spielerlebnis für euch so packend wie möglich zu gestalten. Damit alles zum Start perfekt läuft, haben wir uns entschieden, den Release des <strong>Multiplayer-Modus</strong> auf <strong>Ende Mai 2026</strong> zu legen.<br><br>Wir wissen, dass ihr geduldig wartet, und legen dafür bei den Funktionen noch eine Schippe drauf! Hier ist der aktuelle Stand der Dinge:<br><br><strong>✅ Das erwartet euch zum Start:</strong><br><strong>Eigene Räume:</strong> Erstellt eure eigenen Lobbys und tretet direkt gegen Freunde oder andere Spieler an.<br><br><strong>Volle Kontrolle:</strong> Ihr entscheidet, ob euer Raum <strong>„privat“</strong> (nur für Freunde) oder <strong>„öffentlich“</strong> sein soll.<br><br><strong>Themen-Wahl:</strong> Wählt eure Lieblingskategorien gezielt aus oder lasst euch vom <strong>Zufallsmodus</strong> überraschen.<br><br><strong>Erfolge sichern:</strong> Die Bestenlisten lassen sich künftig ganz einfach als <strong>PDF exportieren</strong> – perfekt, um eure Siege zu teilen oder für die Ewigkeit festzuhalten.<br><br><strong>🛠️ Der Weg bis Mai</strong><br>Die Kernentwicklung ist bereits weit fortgeschritten. In den kommenden Wochen nutzen wir die Zeit für intensives Polishing und den Feinschliff am Matchmaking, damit ihr Ende Mai ein reibungsloses Erlebnis genießen könnt.<br><br>Vielen Dank für euren Support und eure Geduld! Weitere Details zum konkreten Beta-Tag folgen in Kürze.',
+                    'created_at': datetime(2026, 3, 26, 11, 50, tzinfo=timezone.utc)
                 },
 
-                # 2. News: Ticket-Feedback-Anfrage (11.12.2025)
+                # 2. News: Bedanken für Feedback (20.12.2025)
+                {
+                    'title': 'Update: Wir hören euch zu!',
+                    'content': 'Liebe Community, vielen Dank für euer wertvolles Feedback! Wir arbeiten mit Hochdruck daran, Clash under Minds für euch zu perfektionieren. <br><br><b>Das ist neu:</b> Wir haben das <b>Design für alle Endgeräte optimiert</b> und Anzeige-Fehler behoben. Zudem ist euer Fortschritt ab jetzt sicher: Zukünftige Updates werden <b>keinen Datenverlust</b> mehr verursachen! <br><br><b>Stetige Verbesserung:</b> Wir <b>erhöhen kontinuierlich die Anzahl der Fragen</b>, damit es nie langweilig wird. Parallel arbeiten wir bereits an der Einbindung des <b>Multiplayer-Modus</b> und einem neuen <b>Start-Intro</b>. <br><br>Habt ihr weitere Ideen? Schreibt uns einfach über das <a href="/tickets" style="color: #6cf; text-decoration: underline;">Ticketsystem</a>. Gemeinsam machen wir das Quiz noch besser!<br><br>PS: Alle Informationen zu den aktuellsten Updateinhalten stehen im Rechtlichen (erreichbar über Loginmenü)',
+                    'created_at': datetime(2025, 12, 20, 18, 39, tzinfo=timezone.utc)
+                },
+
+                # 3. News: Ticket-Feedback-Anfrage (11.12.2025)
                 {
                     'title': 'Dein Feedback ist gefragt!',
                     'content': 'Liebe Community, da dieses Game für euch ist würden wir uns freuen über Ihre Unterstützung bei der Weiterentwicklung: Ideen, Anregungen und Vorschläge für neue Fragen freuen. Erreichen können Sie uns jederzeit über <a href="/tickets" style="color: #6cf; text-decoration: underline;">Ticketsystem</a>. Ihr Feedback ist uns wichtig, um das Quiz-Erlebnis kontinuierlich zu verbessern!',
-                    'created_at': datetime(2025, 12, 11, 5, 0, tzinfo=timezone.utc)
+                    'created_at': datetime(2025, 12, 11, 5, 5, tzinfo=timezone.utc)
                 },
 
-                # 3. News: Fragen-Bugfix (10.12.2025)
+                # 4. News: Fragen-Bugfix (10.12.2025)
                 {
                     'title': 'Wichtige Meldung: Fragen-Update und Bugfixing',
                     'content': 'Liebe Community, aufgrund häufiger technischer Fehlermeldungen und inkorrekter Inhalte haben wir entschieden, <strong>alle alten Fragen</strong> aus dem System zu entfernen. Wir haben den gesamten Katalog für 15 Themen überarbeitet und durch <strong>1.500 brandneue, geprüfte Fragen</strong> ersetzt (100 pro Thema). Dieser Schritt sorgt für <strong>Stabilität und Korrektheit</strong> im Spiel. Wir arbeiten bereits mit Hochdruck daran, <strong> schnellstmöglich weitere neue Fragen</strong> nachzureichen.',
-                    'created_at': datetime(2025, 12, 10, 5, 0, tzinfo=timezone.utc)
-                },
-
-                # 4. News: Multiplayer-Update (30.11.2025)
-                {
-                    'title': 'Multiplayer-News: Kleine Verzögerung, große Features',
-                    'content': 'Ein kurzes Update zum <strong>Multiplayer-Modus</strong>: Die Entwicklung läuft bereits, wird jedoch erst <strong>Anfang Februar 2026</strong> abgeschlossen sein. Wir bitten die Verzögerung zu entschuldigen.<br><br>Zusätzlich zu den Einstellungen <strong>„privat“</strong> und <strong>„öffentlich“</strong> wird es neue Optionen geben – darunter die Wahl, ob <strong>Themen gezielt ausgewählt</strong> oder <strong>zufällig</strong> erstellt werden. Außerdem lässt sich die <strong>Bestenliste</strong> künftig als <strong>PDF</strong> exportieren.<br><br>Weitere Infos folgen bald!',
-                    'created_at': datetime(2025, 11, 30, 5, 0, tzinfo=timezone.utc)
+                    'created_at': datetime(2025, 12, 10, 13, 35, tzinfo=timezone.utc)
                 },
 
                 # 5. News: Ticketsystem (18.10.2025)
                 {
                     'title': 'Du kannst jetzt mit uns schreiben!',
                     'content': 'Ende des Monats möchten wir ein neues Feature einführen in Support. <br> Dann könnt ihr nicht nur eine Anfrage schicken sondern direkt mit uns schreiben!',
-                    'created_at': datetime(2025, 10, 18, 5, 0, tzinfo=timezone.utc)
+                    'created_at': datetime(2025, 10, 18, 8, 0, tzinfo=timezone.utc)
                 },
 
                 # 6. News: Zufallsmodus (16.10.2025)
                 {
                     'title': 'Neuer Modus in Planung: Zufällige Themen!',
                     'content': 'Um das Quiz-Erlebnis abwechslungsreicher zu gestalten, planen wir die Einführung eines <strong>Zufallsmodus</strong>.<br><br>Dabei werden die Fragen aus <strong>einer zufälligen Anzahl von Themenbereichen</strong> zufällig gezogen. Seid gespannt auf die ultimative Wissensherausforderung!',
-                    'created_at': datetime(2025, 10, 16, 10, 0, tzinfo=timezone.utc)
+                    'created_at': datetime(2025, 10, 16, 22, 32, tzinfo=timezone.utc)
                 },
 
                 # 7. News: Einführung AGB & Datenschutz (15.10.2025)
                 {
                     'title': 'Wichtige Einführung: AGB und Datenschutz',
                     'content': 'Wir haben unsere <strong>Allgemeinen Geschäftsbedingungen (AGB)</strong> und die <strong>Datenschutzerklärung</strong> eingeführt, um Transparenz und Rechtssicherheit zu gewährleisten.<br><br>Du findest die vollständigen Dokumente jederzeit unter "Rechtliche Informationen" im Login-Menü. Wir behalten uns Änderungen vor. Wesentliche Anpassungen werden immer rechtzeitig angekündigt.',
-                    'created_at': datetime(2025, 10, 15, 12, 0, tzinfo=timezone.utc)
-                },
-
-                # 8. News: Multiplayer-Ankündigung (25.09.2025)
-                {
-                    'title': '💥 Ankündigung: Der Multiplayer kommt!',
-                    'content': 'Wir freuen uns, den Start des mit Spannung erwarteten <strong>Multiplayer-Modus</strong> bekanntzugeben – geplant für <strong>Januar 2026</strong>!<br><br>Spieler können in eigenen Räumen gegeneinander antreten. Die Räume werden mit Einstellungen wie <strong>"privat"</strong> oder <strong>"öffentlich"</strong> anpassbar sein. Weitere Details zum Beta-Start folgen in Kürze!',
-                    'created_at': datetime(2025, 9, 25, 18, 30, tzinfo=timezone.utc)
+                    'created_at': datetime(2025, 10, 15, 12, 9, tzinfo=timezone.utc)
                 },
             ]
 
